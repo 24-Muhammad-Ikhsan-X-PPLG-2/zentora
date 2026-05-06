@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Home } from "lucide-react-native";
+import { Colors } from "../constants/design-tokens";
 
 export default function RootLayout() {
   return (
@@ -8,7 +9,10 @@ export default function RootLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => <Home size={28} color={color} />,
+          tabBarLabelStyle: {
+            color: Colors.primary,
+          },
+          tabBarIcon: () => <Home size={32} color={Colors.primary} />,
         }}
       />
     </Tabs>

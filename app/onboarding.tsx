@@ -135,8 +135,6 @@ export default function Onboarding() {
   };
 
   const handleStartApp = async () => {
-    // TODO: Navigate to main app
-    console.log("Navigate to main app");
     await AsyncStorage.setItem("setup", "true");
     const categoriesFav = await AsyncStorage.getItem("categories-fav");
     if (categoriesFav) {

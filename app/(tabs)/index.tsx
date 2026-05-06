@@ -1,12 +1,24 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Search } from "lucide-react-native";
+import { useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { CategorySelect } from "../constants/category";
 import { Colors, Typography } from "../constants/design-tokens";
+import { useOnBoarding } from "../providers/on-boarding-context";
 
 const Main = () => {
+  const [data, setData] = useState<CategorySelect[]>([]);
+  const { reset } = useOnBoarding();
+  useEffect(() => {
+    (async () => {
+      const categoriesFav = await AsyncStorage.getItem("categories-fav");
+      if (!categoriesFav) return;
+      const newData = JSON.parse(categoriesFav);
+      setData(newData);
+    })();
+  }, []);
   return (
     <SafeAreaView>
       <View style={{ paddingHorizontal: 12 }}>
@@ -14,7 +26,7 @@ const Main = () => {
           style={{
             height: 50,
             width: "100%",
-            backgroundColor: "rgb(209, 209, 209)",
+            backgroundColor: "rgb(224, 224, 224)",
             borderRadius: 32,
             paddingHorizontal: 20,
             alignItems: "center",
@@ -46,10 +58,7 @@ const Main = () => {
           alignItems: "center",
           borderRadius: 30,
         }}
-        onPress={async () => {
-          await AsyncStorage.multiRemove(["setup", "categories-fav"]);
-          router.reload();
-        }}
+        onPress={reset}
       >
         <Text
           style={{
@@ -62,6 +71,11 @@ const Main = () => {
           Reset
         </Text>
       </TouchableOpacity>
+      {data ? (
+        data.map((item) => <Text key={item.id}>{item.title}</Text>)
+      ) : (
+        <Text>Data tidak ada</Text>
+      )}
       <StatusBar style="inverted" />
     </SafeAreaView>
   );
