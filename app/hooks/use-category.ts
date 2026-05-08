@@ -9,21 +9,22 @@ const useCategory = () => {
   const addCategory = (id: number) => {
     setCategorySelect((prev) => {
       if (!prev) return prev;
-      const cariItemIdx = prev.findIndex((val) => val.id == id);
-      if (cariItemIdx === -1) return prev;
-      prev[cariItemIdx].centrang = true;
-      const dataBaru = [...prev];
-      return dataBaru;
+      return prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              centrang: !item.centrang,
+            }
+          : item,
+      );
     });
   };
   const removeCategory = (id: number) => {
     setCategorySelect((prev) => {
       if (!prev) return prev;
-      const cariItemIdx = prev.findIndex((val) => val.id == id);
-      if (cariItemIdx === -1) return prev;
-      prev[cariItemIdx].centrang = false;
-      const dataBaru = [...prev];
-      return dataBaru;
+      return prev.map((item) =>
+        item.id === id ? { ...item, centrang: false } : item,
+      );
     });
   };
   const handlePressCategory = (id: number) => {

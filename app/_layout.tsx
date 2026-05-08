@@ -10,6 +10,7 @@ import { Stack } from "expo-router";
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { OnBoardingProvider } from "./providers/on-boarding-context";
+import { ThemeProvider } from "./providers/theme-context";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -24,7 +25,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <OnBoardingProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <ThemeProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </ThemeProvider>
       </OnBoardingProvider>
     </SafeAreaProvider>
   );
