@@ -1,88 +1,105 @@
-import { Image } from "expo-image";
-import { router } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
-import {
-  Dimensions,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Typography } from "./constants/design-tokens";
-
-const { width } = Dimensions.get("window");
+import { ArrowUpRight } from "lucide-react-native";
+import { useEffect } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import { Colors, Typography } from "./constants/design-tokens";
+import CardChapter from "./features/preview/components/CardChapter";
+import Genres from "./features/preview/components/Genres";
+import Hero from "./features/preview/components/Hero";
+import Sipnosis from "./features/preview/components/Sipnosis";
+import TabSelect from "./features/preview/components/TabSelect";
+import getBgColor from "./lib/getBgColor";
+import { useTheme } from "./providers/theme-context";
 
 const Preview = () => {
+  const { theme } = useTheme();
+  const scale = useSharedValue(1);
+  const transformY = useSharedValue(150);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: scale.value,
+      },
+      {
+        translateY: transformY.value,
+      },
+    ],
+  }));
+  useEffect(() => {
+    transformY.value = withSpring(0);
+  }, []);
   return (
     <>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View
-          style={{
-            width,
-            height: 450,
-            position: "relative",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          position: "relative",
+          backgroundColor: getBgColor(theme),
+        }}
+      >
+        {/* Hero */}
+        <Hero />
+        <View>
+          {/* Genres */}
+          <Genres />
+          {/* Sinopsis */}
+          <Sipnosis />
+          {/* Select */}
+          <TabSelect />
           <View
             style={{
-              position: "absolute",
-              width,
-              height: 450,
-              zIndex: 2,
-              backgroundColor: "rgba(0, 0, 0, 0.3)",
-            }}
-          ></View>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#fff",
-              width: 38,
-              height: 38,
-              borderRadius: 999,
-              position: "absolute",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 3,
-              top: 50,
-              left: 25,
-            }}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft size={28} color={"black"} />
-          </TouchableOpacity>
-          <Image
-            source={require("@/assets/images/cover/waguri-2.jpg")}
-            style={{ width, height: 450 }}
-            contentFit="cover"
-            contentPosition={"top"}
-          />
-          <Text
-            style={{
-              fontFamily: Typography.fontFamily.extraBold,
-              fontSize: 26,
-              includeFontPadding: false,
-              position: "absolute",
-              zIndex: 3,
-              color: "#fff",
+              marginTop: 40,
+              paddingHorizontal: 12,
+              flexDirection: "column",
+              gap: 15,
+              paddingBottom: 50,
             }}
           >
-            Karouko Hana Wa Rin To Saku
-          </Text>
+            {Array.from({ length: 10 }).map((_, idx) => {
+              const no = ++idx;
+              return <CardChapter no={no} key={idx} />;
+            })}
+          </View>
         </View>
-        <View
-          style={{
-            backgroundColor: "#fff",
-            marginTop: -50,
-            height: 1000,
-            width,
-            borderTopLeftRadius: 60,
-            borderTopRightRadius: 60,
-            position: "relative",
-            zIndex: 3,
-          }}
-        ></View>
       </ScrollView>
+      <Pressable
+        onPressIn={() => (scale.value = withSpring(0.95))}
+        onPressOut={() => (scale.value = withSpring(1))}
+      >
+        <Animated.View
+          style={[
+            {
+              position: "absolute",
+              bottom: 25,
+              right: 25,
+              padding: 12,
+              height: 100,
+              backgroundColor: Colors.primary,
+              borderRadius: 24,
+              justifyContent: "center",
+            },
+            animatedStyle,
+          ]}
+        >
+          <View style={{}}>
+            <ArrowUpRight size={28} style={{ alignSelf: "flex-end" }} />
+            <Text
+              style={{
+                fontFamily: Typography.fontFamily.regular,
+                includeFontPadding: false,
+                width: "70%",
+                fontSize: 16,
+              }}
+            >
+              Start Reading
+            </Text>
+          </View>
+        </Animated.View>
+      </Pressable>
     </>
   );
 };

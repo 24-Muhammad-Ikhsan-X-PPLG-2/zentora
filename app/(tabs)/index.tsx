@@ -1,11 +1,10 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Moon, Sun } from "lucide-react-native";
+import { Menu, Search } from "lucide-react-native";
 import { useState } from "react";
 import {
   Dimensions,
-  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -15,7 +14,7 @@ import Carousel from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Typography } from "../constants/design-tokens";
 import Dots from "../features/home/components/Dots";
-import SearchBar from "../features/home/components/SearchBar";
+import getBgColor from "../lib/getBgColor";
 import { useTheme } from "../providers/theme-context";
 
 const { width } = Dimensions.get("window");
@@ -35,71 +34,79 @@ const Main = () => {
     require("@/assets/images/banner/banner-3.webp"),
   ];
   return (
-    <SafeAreaView
-      style={{ backgroundColor: theme === "light" ? "white" : "#303030" }}
-    >
-      <View style={{ paddingHorizontal: 22, alignItems: "flex-end" }}>
+    <SafeAreaView style={{ backgroundColor: getBgColor(theme), flex: 1 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          paddingVertical: 12,
+          paddingHorizontal: 18,
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+          <Menu size={28} />
+          <Text
+            style={{
+              fontFamily: Typography.fontFamily.extraBold,
+              includeFontPadding: false,
+              fontSize: 32,
+            }}
+          >
+            Zentora
+          </Text>
+        </View>
         <TouchableOpacity
           style={{
-            padding: 6,
-            backgroundColor: theme === "light" ? "#e4e4e4" : "black",
+            borderWidth: 1,
+            borderColor: "black",
+            height: 40,
+            width: 40,
             borderRadius: 999,
             justifyContent: "center",
             alignItems: "center",
           }}
-          onPress={toggleTheme}
+          onPress={() => router.push("/preview")}
         >
-          {theme === "light" ? (
-            <Sun size={28} color={"black"} />
-          ) : (
-            <Moon size={28} color={"white"} />
-          )}
+          <Search size={18} />
         </TouchableOpacity>
       </View>
-      <SearchBar />
-      <ScrollView
-        contentContainerStyle={{
-          paddingBottom: 150,
-          backgroundColor: theme === "light" ? "white" : "#303030",
-        }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            progressBackgroundColor={theme === "light" ? "white" : "black"}
-            titleColor={theme === "light" ? "black" : "white"}
-            colors={theme === "light" ? ["black"] : ["white"]}
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
-        }
-      >
-        <View
-          style={{
-            marginTop: 20,
-            justifyContent: "center",
-            alignItems: "center",
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Carousel
+          loop
+          autoPlay
+          width={width}
+          height={220}
+          data={banners}
+          scrollAnimationDuration={1200}
+          autoPlayInterval={5000}
+          mode="parallax"
+          onSnapToItem={(idx) => setActiveIndex(idx)}
+          modeConfig={{
+            parallaxScrollingOffset: 5,
+            parallaxScrollingScale: 0.92,
           }}
-        >
-          <Carousel
-            loop
-            autoPlay
-            width={width}
-            height={220}
-            data={banners}
-            scrollAnimationDuration={1200}
-            autoPlayInterval={5000}
-            mode="parallax"
-            onSnapToItem={(idx) => setActiveIndex(idx)}
-            modeConfig={{
-              parallaxScrollingOffset: 5,
-              parallaxScrollingScale: 0.92,
-            }}
-            renderItem={({ item }) => (
+          renderItem={({ item }) => (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
               <View
                 style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  alignSelf: "flex-start",
+                  elevation: 5,
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 4,
+                  },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 6,
+                  backgroundColor: "white",
+                  borderRadius: 28,
                 }}
               >
                 <Image
@@ -112,47 +119,11 @@ const Main = () => {
                   contentFit="cover"
                 />
               </View>
-            )}
-          />
-          <Dots activeIndex={activeIndex} banners={banners} />
-        </View>
-        <View
-          style={{
-            width,
-            flexDirection: "row",
-            flexWrap: "wrap",
-            marginTop: 50,
-            paddingHorizontal: 22,
-            gap: 14,
-            justifyContent: "center",
-          }}
-        >
-          {Array.from({ length: 20 }).map((_, idx) => (
-            <TouchableOpacity
-              style={{ width: 180, height: 250, marginBottom: 32 }}
-              key={idx}
-              onPress={() => router.push("/preview")}
-            >
-              <Image
-                source={require("@/assets/images/cover/waguri.jpg")}
-                style={{ width: 180, height: 240, borderRadius: 12 }}
-                contentFit="cover"
-              />
-              <Text
-                style={{
-                  marginTop: 3,
-                  fontFamily: Typography.fontFamily.medium,
-                  includeFontPadding: false,
-                  color: theme === "light" ? "black" : "white",
-                }}
-              >
-                Karouko Hana Wa Rin To Saku
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+            </View>
+          )}
+        />
+        <Dots activeIndex={activeIndex} banners={banners} />
       </ScrollView>
-
       <StatusBar style={theme === "light" ? "dark" : "light"} />
     </SafeAreaView>
   );

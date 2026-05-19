@@ -1,6 +1,8 @@
 import { Tabs } from "expo-router";
-import { Home } from "lucide-react-native";
-import { Colors } from "../constants/design-tokens";
+import { Book, House, User } from "lucide-react-native";
+import { StyleSheet } from "react-native";
+import { Colors, Typography } from "../constants/design-tokens";
+import getBgColor from "../lib/getBgColor";
 import { useTheme } from "../providers/theme-context";
 
 export default function RootLayout() {
@@ -10,20 +12,54 @@ export default function RootLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: theme === "light" ? "white" : "#303030",
+          backgroundColor: getBgColor(theme),
         },
       }}
     >
       <Tabs.Screen
+        name="library"
+        options={{
+          title: "Library",
+          tabBarLabelStyle: styles.labelStyle,
+          tabBarActiveTintColor: Colors.primary,
+          tabBarIcon: ({ focused }) => (
+            <Book size={32} color={focused ? Colors.primary : "grey"} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-          tabBarLabelStyle: {
-            color: Colors.primary,
-          },
-          tabBarIcon: () => <Home size={32} color={Colors.primary} />,
+          tabBarLabelStyle: styles.labelStyle,
+          tabBarActiveTintColor: Colors.primary,
+          tabBarIcon: ({ focused }) => (
+            <House size={32} color={focused ? Colors.primary : "grey"} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarLabelStyle: styles.labelStyle,
+          tabBarActiveTintColor: Colors.primary,
+          tabBarIcon: ({ focused }) => (
+            <User size={32} color={focused ? Colors.primary : "grey"} />
+          ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  labelStyle: {
+    fontFamily: Typography.fontFamily.regular,
+    includeFontPadding: false,
+    fontSize: 14,
+  },
+  labelStyleHover: {
+    color: Colors.primary,
+  },
+});
