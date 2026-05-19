@@ -8,13 +8,13 @@
 ## Install
 
 ```sh
-npm install
+bun install
 ```
 
 ## Usage
 
 ```sh
-npm run start
+bun start
 ```
 
 ## Author
