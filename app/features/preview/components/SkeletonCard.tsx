@@ -1,25 +1,16 @@
 import { Typography } from "@/app/constants/design-tokens";
 import { getTextColor } from "@/app/lib/getBgColor";
 import { useTheme } from "@/app/providers/theme-context";
-import { ChaptersDataType } from "@/app/types/chapters";
 import { Image } from "expo-image";
-import React, { FC } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 
-type CardChapterProps = {
-  chapter: ChaptersDataType;
-  coverImgUrl: string;
-};
-
-const CardChapter: FC<CardChapterProps> = ({ chapter, coverImgUrl }) => {
+const SkeletonCard = () => {
   const { theme } = useTheme();
   return (
     <View>
-      <TouchableOpacity
-        style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
-      >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <Image
-          source={{ uri: coverImgUrl }}
+          placeholder={{ blurhash: "" }}
           style={{ width: 110, height: 110, borderRadius: 24 }}
           contentFit="cover"
           contentPosition={"center"}
@@ -40,7 +31,7 @@ const CardChapter: FC<CardChapterProps> = ({ chapter, coverImgUrl }) => {
                 color: getTextColor(theme),
               }}
             >
-              Chap {chapter.attributes.chapter}
+              Loading...
             </Text>
             <Text
               style={{
@@ -50,7 +41,7 @@ const CardChapter: FC<CardChapterProps> = ({ chapter, coverImgUrl }) => {
                 color: getTextColor(theme),
               }}
             >
-              {chapter.attributes.title}
+              Loading...
             </Text>
           </View>
           <Text
@@ -61,10 +52,10 @@ const CardChapter: FC<CardChapterProps> = ({ chapter, coverImgUrl }) => {
               color: "grey",
             }}
           >
-            20/04/2022
+            Loading...
           </Text>
         </View>
-      </TouchableOpacity>
+      </View>
       <View
         style={{
           width: "100%",
@@ -77,4 +68,4 @@ const CardChapter: FC<CardChapterProps> = ({ chapter, coverImgUrl }) => {
   );
 };
 
-export default CardChapter;
+export default SkeletonCard;

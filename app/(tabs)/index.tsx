@@ -1,131 +1,167 @@
-import { Image } from "expo-image";
-import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Menu, Search } from "lucide-react-native";
-import { useState } from "react";
+import { Funnel } from "lucide-react-native";
+import { FC, useState } from "react";
 import {
-  Dimensions,
+  FlatList,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Typography } from "../constants/design-tokens";
-import Dots from "../features/home/components/Dots";
+import CardManga from "../features/home/components/CardManga";
+import CarouselCard from "../features/home/components/CarouselCard";
+import Header from "../features/home/components/Header";
+import LoadMore from "../features/home/components/LoadMore";
+import SkeletonCard from "../features/home/components/SkeletonCard";
+import useMangas from "../features/hooks/useMangas";
 import getBgColor from "../lib/getBgColor";
+import { skeletonData } from "../lib/helper";
 import { useTheme } from "../providers/theme-context";
-
-const { width } = Dimensions.get("window");
+import { MangaData } from "../types/mangas";
 
 const Main = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
+  const {
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    mangas,
+    refetch,
+  } = useMangas();
   const onRefresh = async () => {
     setRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await refetch();
     setRefreshing(false);
   };
-  const banners = [
-    require("@/assets/images/banner/banner-1.webp"),
-    require("@/assets/images/banner/banner-2.jpg"),
-    require("@/assets/images/banner/banner-3.webp"),
-  ];
+
   return (
     <SafeAreaView style={{ backgroundColor: getBgColor(theme), flex: 1 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          paddingVertical: 12,
-          paddingHorizontal: 18,
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-          <Menu size={28} />
-          <Text
-            style={{
-              fontFamily: Typography.fontFamily.extraBold,
-              includeFontPadding: false,
-              fontSize: 32,
-            }}
-          >
-            Zentora
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={{
-            borderWidth: 1,
-            borderColor: "black",
-            height: 40,
-            width: 40,
-            borderRadius: 999,
-            justifyContent: "center",
-            alignItems: "center",
+      <Header />
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={
+            !isLoading
+              ? mangas?.pages.flatMap((page) => page.data)
+              : skeletonData
+          }
+          scrollEnabled
+          contentContainerStyle={{
+            paddingTop: 10,
+            paddingBottom: 30,
           }}
-          onPress={() => router.push("/preview")}
-        >
-          <Search size={18} />
-        </TouchableOpacity>
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Carousel
-          loop
-          autoPlay
-          width={width}
-          height={220}
-          data={banners}
-          scrollAnimationDuration={1200}
-          autoPlayInterval={5000}
-          mode="parallax"
-          onSnapToItem={(idx) => setActiveIndex(idx)}
-          modeConfig={{
-            parallaxScrollingOffset: 5,
-            parallaxScrollingScale: 0.92,
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          numColumns={2}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+            paddingHorizontal: 16,
+            marginBottom: 16,
           }}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "row",
-              }}
-            >
+            <>
+              {isLoading ? (
+                <SkeletonCard />
+              ) : (
+                <CardManga manga={item as MangaData} />
+              )}
+            </>
+          )}
+          ListHeaderComponent={
+            <>
+              <CarouselCard />
               <View
                 style={{
-                  alignSelf: "flex-start",
-                  elevation: 5,
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 4,
-                  },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 6,
-                  backgroundColor: "white",
-                  borderRadius: 28,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingVertical: 14,
+                  marginBottom: 16,
                 }}
               >
-                <Image
-                  source={item}
-                  style={{
-                    width: width * 0.9,
-                    height: 210,
-                    borderRadius: 28,
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingHorizontal: 18,
+                    gap: 10,
+                    flexDirection: "row",
                   }}
-                  contentFit="cover"
-                />
+                >
+                  {["Popular", "Action", "Comedy", "Romance", "Harem"].map(
+                    (item) => (
+                      <CardCategory
+                        key={item}
+                        text={item}
+                        active={item === "Popular"}
+                      />
+                    ),
+                  )}
+                </ScrollView>
+
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 10,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderRadius: 999,
+                    marginRight: 18,
+                    backgroundColor: "white",
+                  }}
+                >
+                  <Funnel size={18} color={"black"} />
+                </TouchableOpacity>
               </View>
-            </View>
-          )}
+            </>
+          }
+          ListFooterComponent={
+            <LoadMore
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isPending={isFetchingNextPage}
+            />
+          }
         />
-        <Dots activeIndex={activeIndex} banners={banners} />
-      </ScrollView>
+      </View>
       <StatusBar style={theme === "light" ? "dark" : "light"} />
     </SafeAreaView>
+  );
+};
+
+type CardCategoryProp = {
+  text?: string;
+  active?: boolean;
+};
+
+export const CardCategory: FC<CardCategoryProp> = ({
+  text = "Category",
+  active = false,
+}) => {
+  return (
+    <TouchableOpacity
+      style={{
+        paddingVertical: 10,
+        paddingHorizontal: 24,
+        borderWidth: 1,
+        borderRadius: 999,
+        backgroundColor: active ? "#333333" : "white",
+      }}
+    >
+      <Text
+        style={{
+          fontFamily: Typography.fontFamily.regular,
+          includeFontPadding: false,
+          color: active ? "white" : "black",
+        }}
+      >
+        {text}
+      </Text>
+    </TouchableOpacity>
   );
 };
 

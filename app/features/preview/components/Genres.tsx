@@ -1,11 +1,17 @@
 import { Typography } from "@/app/constants/design-tokens";
 import { getBgColorReverse, getTextColorReverse } from "@/app/lib/getBgColor";
 import { useTheme } from "@/app/providers/theme-context";
-import React from "react";
+import { Tag } from "@/app/types/manga";
+import React, { FC } from "react";
 import { ScrollView, Text, View } from "react-native";
 
-const Genres = () => {
+type GenresProps = {
+  tags: Tag[] | null;
+};
+
+const Genres: FC<GenresProps> = ({ tags }) => {
   const { theme } = useTheme();
+  if (!tags) return <></>;
   return (
     <ScrollView
       horizontal
@@ -17,7 +23,7 @@ const Genres = () => {
         alignSelf: "flex-start",
       }}
     >
-      {Array.from({ length: 3 }).map((_, idx) => (
+      {tags.map((item, idx) => (
         <View
           style={{
             backgroundColor: getBgColorReverse(theme),
@@ -37,7 +43,7 @@ const Genres = () => {
               color: getTextColorReverse(theme),
             }}
           >
-            Romance
+            {item.attributes.name.en}
           </Text>
         </View>
       ))}

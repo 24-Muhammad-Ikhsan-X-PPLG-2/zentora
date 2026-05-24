@@ -3,20 +3,39 @@ import { getTextColor } from "@/app/lib/getBgColor";
 import { useTheme } from "@/app/providers/theme-context";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { ChevronLeft, Eye, List, Star } from "lucide-react-native";
-import React from "react";
+import { ChevronLeft, List, Star } from "lucide-react-native";
+import React, { FC } from "react";
 import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import BookmarkButton from "./BookmarkButton";
 
 const { width } = Dimensions.get("window");
 
-const Hero = () => {
+type HeroProps = {
+  title: string;
+  imageUrl: string;
+  chapters: string;
+  mangaka1: string;
+  mangaka2: string;
+  status: string;
+};
+
+const Hero: FC<HeroProps> = ({
+  imageUrl,
+  title,
+  chapters,
+  mangaka1,
+  mangaka2,
+  status,
+}) => {
   const { theme } = useTheme();
   return (
     <View style={{ position: "relative" }}>
       <Image
-        source={require("@/assets/images/cover/waguri-2.jpg")}
+        source={{ uri: imageUrl }}
         style={{ width, height: 300 }}
+        placeholder={{ blurhash: "LEHV6nWB2yk8pyo0adR*.7kCMdnj" }}
+        transition={300}
+        blurRadius={1}
         contentFit="cover"
         contentPosition={"top"}
       />
@@ -62,7 +81,9 @@ const Hero = () => {
         }}
       >
         <Image
-          source={require("@/assets/images/cover/waguri.jpg")}
+          source={{ uri: imageUrl }}
+          placeholder={{ blurhash: "LEHV6nWB2yk8pyo0adR*.7kCMdnj" }}
+          transition={300}
           style={{ width: 200, height: 300, borderRadius: 12 }}
           contentFit="cover"
           contentPosition={"center"}
@@ -89,7 +110,7 @@ const Hero = () => {
                 flexWrap: "wrap",
               }}
             >
-              Karouko Hana Wa Rin To Saku
+              {title}
             </Text>
             <Text
               style={{
@@ -100,7 +121,7 @@ const Hero = () => {
                 color: "white",
               }}
             >
-              AKA AKASAKA
+              {mangaka1}
             </Text>
             <Text
               style={{
@@ -111,7 +132,7 @@ const Hero = () => {
                 color: "white",
               }}
             >
-              X MENGO YOKOYARI
+              {mangaka2}
             </Text>
           </View>
           <View style={{ flexDirection: "column", gap: 10 }}>
@@ -130,21 +151,53 @@ const Hero = () => {
                 4.5/5
               </Text>
             </View>
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-            >
-              <Eye size={20} color={"grey"} />
-              <Text
-                style={{
-                  fontFamily: Typography.fontFamily.regular,
-                  includeFontPadding: false,
-                  fontSize: 18,
-                  color: getTextColor(theme),
-                }}
+            {status.toLowerCase() === "ongoing" ? (
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
               >
-                2.124.339
-              </Text>
-            </View>
+                <View
+                  style={{
+                    width: 20,
+                    height: 20,
+                    backgroundColor: "#5291d8",
+                    borderRadius: 999,
+                  }}
+                ></View>
+                <Text
+                  style={{
+                    fontFamily: Typography.fontFamily.regular,
+                    includeFontPadding: false,
+                    fontSize: 18,
+                    color: getTextColor(theme),
+                  }}
+                >
+                  Ongoing
+                </Text>
+              </View>
+            ) : (
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              >
+                <View
+                  style={{
+                    width: 20,
+                    height: 20,
+                    backgroundColor: "#6dd852",
+                    borderRadius: 999,
+                  }}
+                ></View>
+                <Text
+                  style={{
+                    fontFamily: Typography.fontFamily.regular,
+                    includeFontPadding: false,
+                    fontSize: 18,
+                    color: getTextColor(theme),
+                  }}
+                >
+                  Completed
+                </Text>
+              </View>
+            )}
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
             >
@@ -157,7 +210,7 @@ const Hero = () => {
                   color: getTextColor(theme),
                 }}
               >
-                134 Chapters
+                {chapters} Chapters
               </Text>
             </View>
           </View>
